@@ -1,5 +1,7 @@
 ### **Static Website Hosting on AWS**
 
+![AWS Cloud Portfolio](https://github.com/JasonTeixeira/CloudResumeChallangeAWS/blob/main/AWS%20Cloud%20Portfolio.png)
+
 **Project Summary:**
 
 Deployed a highly available, secure, and cost-effective static website leveraging AWS services. This project demonstrates expertise in setting up serverless architecture for hosting static web content with built-in security, scalability, and monitoring capabilities.
