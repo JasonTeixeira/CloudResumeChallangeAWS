@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  # S3 Bucket for Static Website Hosting
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: jasonteixeira-blog
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+      AccessControl: PublicRead
+
+  # S3 Bucket Policy for Public Read Access
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::jasonteixeira-blog/*"
+
+  # ACM Certificate for HTTPS
+  SiteCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: jasonteixeira.com
+      SubjectAlternativeNames:
+        - www.jasonteixeira.com
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: jasonteixeira.com
+          ValidationDomain: jasonteixeira.com
+
+  # CloudFront Distribution with HTTPS
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SiteCertificate
+          SslSupportMethod: sni-only
+        DefaultCacheBehavior:
+          TargetOriginId: WebsiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: 
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        Origins:
+          - DomainName: !GetAtt WebsiteBucket.WebsiteURL
+            Id: WebsiteOrigin
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
+
+  # Route 53 Hosted Zone (Use your existing one or update HostedZoneId)
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: jasonteixeira.com
+
+  # A Record for Root Domain (Alias to CloudFront)
+  RootARecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: jasonteixeira.com
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2  # Hosted Zone ID for CloudFront (Global)
+
+  # A Record for www Subdomain (Alias to CloudFront)
+  WWWARecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: www.jasonteixeira.com
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2  # Hosted Zone ID for CloudFront (Global)
