@@ -6,6 +6,11 @@
 
 This project involves hosting a static website on **AWS S3**, serving the content through **CloudFront** for content delivery optimization, managing the domain with **Route 53**, and securing the site with **HTTPS using AWS Certificate Manager (ACM)**. This guide walks through each step, from buying the domain to setting up certificates, configuring DNS, and deploying the site on AWS.
 
+## Website on AWS
+
+[![Visit JasonTeixeira.com](https://img.shields.io/badge/JasonTeixeira.com-Visit-green?style=for-the-badge)](https://Jasonteixeira.com)
+[![Visit www.JasonTeixeira.com](https://img.shields.io/badge/www.JasonTeixeira.com-Visit-green?style=for-the-badge)](https://www.Jasonteixeira.com)
+
 ---
 
 ## **Table of Contents**
